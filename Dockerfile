@@ -43,21 +43,24 @@ RUN mkdir -p storage/keys && chmod -R 775 storage bootstrap/cache
 # Create storage directories for volume mount
 RUN mkdir -p storage/app/public/documents
 
-# Create startup script
+# Create startup script - run setup tasks quickly, then start server
 RUN echo '#!/bin/bash\n\
 set -e\n\
 PORT=${PORT:-8000}\n\
-echo "Setting up storage directories..."\n\
+\n\
+# Quick setup (these are fast)\n\
 mkdir -p storage/app/public/documents\n\
-chmod -R 775 storage\n\
-echo "Creating storage symlink..."\n\
-php artisan storage:link --force\n\
-echo "Running migrations..."\n\
+chmod -R 775 storage 2>/dev/null || true\n\
+php artisan storage:link --force 2>/dev/null || true\n\
+\n\
+# Run migrations (required before server)\n\
 php artisan migrate --force\n\
-echo "Seeding database..."\n\
-php artisan db:seed --force\n\
-echo "Generating JWT keys..."\n\
-php artisan jwt:generate-keys\n\
+\n\
+# Run seeding and JWT generation in background\n\
+(php artisan db:seed --force 2>/dev/null || true) &\n\
+(php artisan jwt:generate-keys 2>/dev/null || true) &\n\
+\n\
+# Start server immediately\n\
 echo "Starting server on port $PORT..."\n\
 php artisan serve --host=0.0.0.0 --port=$PORT\n' > /usr/local/bin/start.sh && chmod +x /usr/local/bin/start.sh
 
