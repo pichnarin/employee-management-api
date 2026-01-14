@@ -29,6 +29,19 @@ class UserController extends Controller
     }
 
     /**
+     * Get user by Id
+     */
+    public function getUserById(String $userId): JsonResponse
+    {
+        $user = $this->userService->getUserProfile($userId);
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
+
+    /**
      * Get list of all users - can be filtered by role or status
      */
     public function listUsers(Request $request): JsonResponse

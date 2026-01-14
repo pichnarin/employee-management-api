@@ -93,6 +93,7 @@ Route::middleware(['jwt.auth'])->group(function () {
     // Admin-only routes (user management)
     Route::middleware(['admin.only'])->group(function () {
         // User CRUD operations
+        Route::get('/user-detail/{userId}', [UserController::class, 'getUserById']);
         Route::get('/get-users', [UserController::class, 'listUsers']);
         Route::post('/create-user', [UserController::class, 'createUser']);
         Route::patch('/update-user-information/{userId}', [UserController::class, 'updateUserInformation']);

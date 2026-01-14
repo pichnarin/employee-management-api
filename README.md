@@ -90,6 +90,10 @@ docker-compose logs -f postgres
 # Access backend shell
 docker-compose exec backend bash
 
+#Configuration shell
+docker compose exec backend /bin/bash #For docker
+railway ssh --project=project-id --environment=environment-id --service=service-id #For railway
+
 ## Project Structure
 
 ```
